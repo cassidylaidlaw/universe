@@ -9,6 +9,7 @@ setup(name='universe',
       packages=[package for package in find_packages()
                 if package.startswith('universe')],
       install_requires=[
+          'attrs',
           'autobahn>=0.16.0',
           'docker-py==1.10.3',
           'docker-pycreds==0.2.1',

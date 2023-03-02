@@ -71,6 +71,7 @@ class VNCSession(object):
         return observations
 
     def step(self, action):
+        # self._step(action)
         reactor.callFromThread(self._step, action)
         return self.flip()
 

@@ -1,8 +1,6 @@
 import logging
 import numpy as np
 
-from gym.utils import reraise
-
 from universe import error, rewarder, spaces, utils, vectorized
 from universe.envs import diagnostics
 from universe.remotes import healthcheck
@@ -49,10 +47,10 @@ class DummyVNCEnv(vectorized.Env):
         self._reward_buffers = [rewarder.RewardBuffer('dummy:{}'.format(i)) for i in range(self.n)]
         self._started = True
 
-    def _reset(self):
+    def reset(self):
         return [None] * self.n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         assert self.n == len(action_n), "Expected {} actions but received {}: {}".format(self.n, len(action_n), action_n)
 
         observation_n = [{

@@ -57,13 +57,13 @@ class _UniverseMonitor(core.Wrapper):
                 self.mode
             )
 
-    def _step(self, action_n):
+    def step(self, action_n):
         self._monitor._before_step(action_n[0])
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         done_n[0] = self._monitor._after_step(observation_n[0], reward_n[0], done_n[0], info)
         return observation_n, reward_n, done_n, info
 
-    def _reset(self):
+    def reset(self):
         self._monitor._before_reset()
         observation_n = self.env.reset()
         self._monitor._after_reset(observation_n[0])

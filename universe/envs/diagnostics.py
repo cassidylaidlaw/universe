@@ -9,7 +9,6 @@ import threading
 # import psutil
 import sys
 from collections import namedtuple
-from gym.utils import reraise
 
 import re
 from universe import error, pyprofile, spaces
@@ -91,8 +90,8 @@ class AsyncDecode(object):
             pyprofile.incr('vnc_env.diagnostics.async_decode.schedule')
             # sneakily copy if numpy hasn't, so it can be cached
             self._last_img = np.ascontiguousarray(grayscale)
-            async = self.qr_pool.apply_async(self.method, (self._last_img, time.time(), available_at))
-            self.deque.append(async)
+            async_result = self.qr_pool.apply_async(self.method, (self._last_img, time.time(), available_at))
+            self.deque.append(async_result)
         else:
             pyprofile.incr('vnc_env.diagnostics.async_decode.cache_hit')
 
@@ -257,10 +256,10 @@ class Diagnostics(object):
             return
 
         with pyprofile.push('vnc_env.diagnostics.Diagnostics.add_metadata'):
-            async = self.pool.imap_unordered(
+            async_result = self.pool.imap_unordered(
                 self._add_metadata_i,
                 zip(self.instance_n, observation_n, info_n, [available_at] * len(observation_n)))
-            list(async)
+            list(async_result)
 
     def _add_metadata_i(self, args):
         instance, observation, info, now = args

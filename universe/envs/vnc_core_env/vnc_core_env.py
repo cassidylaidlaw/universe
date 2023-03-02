@@ -64,7 +64,7 @@ class GymCoreSyncEnv(GymCoreEnv):
                 time.sleep(tick)
         return observation_n, info_n
 
-    def _reset(self):
+    def reset(self):
         assert self.rewarder_session
 
         result = self.rewarder_session.reset(
@@ -90,7 +90,7 @@ class GymCoreSyncEnv(GymCoreEnv):
             assert all(observation is not None for observation in observation_n), 'At least one missing observation: {}'.format(observation_n)
             return self._core_env.observation_space.from_jsonable(observation_n)
 
-    def _step(self, action_n):
+    def step(self, action_n):
         # Add C keypress in order to "commit" the action, as
         # interpreted by the remote.
         action_n = [action + [

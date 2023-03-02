@@ -36,7 +36,7 @@ class UniverseTimeLimit(core.Wrapper):
 
         return False
 
-    def _step(self, action_n):
+    def step(self, action_n):
         assert self._episode_started_at is not None, "Cannot call env.step() before calling reset()"
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         self._elapsed_steps += 1
@@ -47,7 +47,7 @@ class UniverseTimeLimit(core.Wrapper):
 
         return observation_n, reward_n, done_n, info
 
-    def _reset(self):
+    def reset(self):
         self._episode_started_at = time.time()
         self._elapsed_steps = 0
         return self.env.reset()

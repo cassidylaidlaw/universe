@@ -2,7 +2,7 @@
 # from universe import vectorized
 
 # class SimpleEnv(vectorized.Env):
-#     def _step(self, action_n):
+#     def step(self, action_n):
 #         return {'vision': np.zeros((10, 10))}, 10, False, {}
 
 

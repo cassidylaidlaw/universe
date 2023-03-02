@@ -114,7 +114,7 @@ import uuid
 def random_alphanumeric(length=14):
     buf = []
     while len(buf) < length:
-        entropy = base64.encodestring(uuid.uuid4().bytes).decode('ascii')
+        entropy = base64.encodebytes(uuid.uuid4().bytes).decode('ascii')
         bytes = [c for c in entropy if c.isalnum()]
         buf += bytes
     return ''.join(buf)[:length]
@@ -135,7 +135,7 @@ def best_effort(function, *args, **kwargs):
 import base64
 def basic_auth_encode(username, password=''):
     fmt = '{}:{}'.format(username, password)
-    return 'Basic ' + base64.encodestring(fmt.encode('utf-8')).rstrip().decode('utf-8')
+    return 'Basic ' + base64.encodebytes(fmt.encode('utf-8')).rstrip().decode('utf-8')
 
 def basic_auth_decode(header):
     if header.startswith('Basic '):

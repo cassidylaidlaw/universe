@@ -104,7 +104,7 @@ class GymCoreObservation(vectorized.Wrapper):
 
         self._gym_core_env = gym.spec(gym_core_id).make()
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         self.reward_n = [0] * self.n
         self.done_n = [False] * self.n
@@ -116,7 +116,7 @@ class GymCoreObservation(vectorized.Wrapper):
         )
         return self._observation(self.done_n, self.info)
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         if self.reward_n is not None:
             rewarder.merge_n(

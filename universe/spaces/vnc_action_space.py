@@ -1,7 +1,7 @@
 import gym
 import string
 
-from gym.spaces import prng
+import numpy as np
 
 from universe.vncdriver import constants
 from universe.spaces import vnc_event
@@ -69,18 +69,18 @@ class VNCActionSpace(gym.Space):
     def sample(self):
         # Both key and pointer allowed
         if self.screen_shape is not None:
-            event_type = prng.np_random.randint(2)
+            event_type = np.random.randint(2)
         else:
             event_type = 0
 
         if event_type == 0:
             # Let's press a key
-            key = prng.np_random.choice(self.keys)
+            key = np.random.choice(self.keys)
             event = [key]
         else:
-            x = prng.np_random.randint(self.screen_shape[0])
-            y = prng.np_random.randint(self.screen_shape[1])
-            buttonmask = prng.np_random.choice(self.buttonmasks)
+            x = np.random.randint(self.screen_shape[0])
+            y = np.random.randint(self.screen_shape[1])
+            buttonmask = np.random.choice(self.buttonmasks)
 
             event = [vnc_event.PointerEvent(x, y, buttonmask)]
         return event

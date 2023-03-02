@@ -1,0 +1,91 @@
+metadata:
+  source_demonstration: 1476158465-da6om3dasbesxt-1
+  states:
+    gameover0: {timestamp: 330.33634328842163}
+    gameover1: {timestamp: 346.7433433532715}
+    gameover2: {timestamp: 353.70334339141846}
+    initialize0: {timestamp: 35.90899991989136}
+    initialize1: {timestamp: 81.86434316635132}
+    initialize2: {timestamp: 112.00200009346008}
+    initialize3: {timestamp: 128.5329999923706}
+    ready0: {timestamp: 131.66499996185303}
+    ready1: {timestamp: 153.6973433494568}
+states:
+  gameover0:
+    crop_coords: [163, 25, 125, 25]
+    image_name: gameover0.png
+    stage: gameover
+    type: ImageMatchState
+  gameover1:
+    crop_coords: [365, 25, 151, 25]
+    image_name: gameover1.png
+    stage: gameover
+    type: ImageMatchState
+  gameover2:
+    crop_coords: [25, 25, 174, 25]
+    image_name: gameover2.png
+    stage: gameover
+    type: ImageMatchState
+  initialize0:
+    cooloff: 3
+    crop_coords: [332, 25, 390, 25]
+    image_name: initialize0.png
+    stage: initial
+    type: ImageMatchState
+  initialize1:
+    cooloff: 3
+    crop_coords: [414, 25, 241, 25]
+    image_name: initialize1.png
+    type: ImageMatchState
+  initialize2:
+    cooloff: 3
+    crop_coords: [326, 25, 134, 25]
+    image_name: initialize2.png
+    type: ImageMatchState
+  initialize3:
+    cooloff: 3
+    crop_coords: [93, 25, 454, 25]
+    image_name: initialize3.png
+    type: ImageMatchState
+    # match_threshold: 1
+  ready0:
+    autoactive: 5
+    cooloff: 3
+    crop_coords: [82, 25, 425, 25]
+    image_name: ready0.png
+    stage: ready
+    type: ImageMatchState
+  ready1:
+    autoactive: 5
+    cooloff: 3
+    crop_coords: [129, 25, 529, 25]
+    image_name: ready1.png
+    stage: ready
+    type: ImageMatchState
+transitions:
+  initialize0:
+    buttonmask: 1
+    dsts: [initialize1]
+    type: ClickTransition
+    x: 354
+    y: 408
+  initialize1:
+    buttonmask: 1
+    dsts: [initialize2]
+    type: ClickTransition
+    x: 351
+    y: 477
+  initialize2:
+    buttonmask: 1
+    dsts: [initialize3]
+    type: ClickTransition
+    x: 342
+    y: 198
+  initialize3:
+    buttonmask: 1
+    dsts: [ready0, ready1]
+    type: ClickTransition
+    x: 98
+    y: 468
+  ready0: {type: ClickTransition, x: 0, y: 0}
+  ready1: {type: ClickTransition, x: 0, y: 0}

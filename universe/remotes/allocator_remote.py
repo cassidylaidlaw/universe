@@ -9,8 +9,8 @@ import threading
 import time
 
 import gym
-from gym import scoreboard
-from gym.utils import reraise
+# from gym import scoreboard
+# from gym.utils import reraise
 
 from universe import error, utils
 from universe.remotes import remote

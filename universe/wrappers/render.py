@@ -24,17 +24,17 @@ class Render(vectorized.Wrapper):
         if 'rgb_array' not in modes:
             modes.append('rgb_array')
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         self._observation = observation_n[0]
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info_n = self.env.step(action_n)
         self._observation = observation_n[0]
         return observation_n, reward_n, done_n, info_n
 
-    def _render(self, mode='human', *args, **kwargs):
+    def render(self, mode='human', *args, **kwargs):
         if not self.renderable and mode == 'human':
             return
         elif self.env is None:

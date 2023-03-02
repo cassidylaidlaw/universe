@@ -22,14 +22,14 @@ class VectorizeFilter(core.Wrapper):
         self._args = args
         self._kwargs = kwargs
 
-    def _reset(self):
+    def reset(self):
         if self.filter_n is None:
             self.filter_n = [self.filter_factory(*self._args, **self._kwargs) for _ in range(self.n)]
         observation_n = self.env.reset()
         observation_n = [filter._after_reset(observation) for filter, observation in zip(self.filter_n, observation_n)]
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         o_n, r_n, d_n, i = self.env.step(action_n)
 
         observation_n = []

@@ -1,5 +1,6 @@
 import logging
-from gym import configuration
+# from gym import configuration
+configuration = None
 
 universe_logger = logging.getLogger('universe')
 universe_logger.setLevel(logging.INFO)

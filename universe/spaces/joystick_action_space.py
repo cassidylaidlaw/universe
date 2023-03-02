@@ -1,7 +1,7 @@
 import gym
 from gym.spaces import Box
 from universe.spaces import joystick_event
-from gym.spaces import prng
+import numpy.random as prng
 from collections import OrderedDict
 
 

@@ -5,7 +5,6 @@ import socket
 import time
 
 from universe import error, utils
-from gym.utils import reraise
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +52,8 @@ class Healthcheck(object):
                 # gaierror: can't resolve the address yet, which can also happen on kubernetes
                 expected = socket.errno.ECONNREFUSED == e.errno or socket.errno.ETIMEDOUT == e.errno or isinstance(e, socket.gaierror)
                 if self.start_timeout is None or not expected:
-                    reraise(suffix='while connecting to VNC server {}'.format(address))
+                    raise e
+                    # reraise(suffix='while connecting to VNC server {}'.format(address))
                 logger.info('VNC server %s did not come up yet (error: %s). Sleeping for 1s.', address, e)
                 time.sleep(1)
             else:

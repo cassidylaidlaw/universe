@@ -1,4 +1,4 @@
-from gym.spaces import prng
+import numpy as np
 
 class Hardcoded(object):
     def __init__(self, actions):
@@ -8,7 +8,7 @@ class Hardcoded(object):
         return action in self.actions
 
     def sample(self):
-        i = prng.np_random.randint(len(self.actions))
+        i = np.random.randint(len(self.actions))
         return self.actions[i]
 
     def __getitem__(self, i):

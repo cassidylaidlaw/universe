@@ -19,11 +19,11 @@ rather than a list of observations), turn it into a vectorized environment with 
         assert self.metadata.get('runtime.vectorized')
         self.n = 1
 
-    def _reset(self):
+    def reset(self):
         observation = self.env.reset()
         return [observation]
 
-    def _step(self, action):
+    def step(self, action):
         observation, reward, done, info = self.env.step(action[0])
         return [observation], [reward], [done], {'n': [info]}
 
@@ -37,12 +37,12 @@ Take a vectorized environment with a batch of size 1 and turn it into an unvecto
     autovectorize = False
     metadata = {'runtime.vectorized': False}
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         assert(len(observation_n) == 1)
         return observation_n[0]
 
-    def _step(self, action):
+    def step(self, action):
         action_n = [action]
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         return observation_n[0], reward_n[0], done_n[0], info['n'][0]

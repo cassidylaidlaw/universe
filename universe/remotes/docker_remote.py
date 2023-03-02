@@ -11,7 +11,7 @@ import time, random
 
 import docker
 import six.moves.urllib.parse as urlparse
-from gym.utils import closer
+from universe.utils import closer
 from universe import error
 from universe.remotes import healthcheck, remote
 from universe import error, utils
@@ -24,7 +24,7 @@ docker_closer = closer.Closer()
 def random_alphanumeric(length=14):
     buf = []
     while len(buf) < length:
-        entropy = base64.encodestring(uuid.uuid4().bytes).decode('utf-8')
+        entropy = base64.encodebytes(uuid.uuid4().bytes).decode('utf-8')
         bytes = [c for c in entropy if c.isalnum()]
         buf += bytes
     return ''.join(buf)[:length]

@@ -13,11 +13,11 @@ The Vision wrapper extracts the vision modality and discards all others.  This i
 when we only care about the visual input.
 """
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         return [ob['vision'] if ob is not None else ob for ob in observation_n]
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info_n = self.env.step(action_n)
         observation_n = [ob['vision'] if ob is not None else ob for ob in observation_n]
         return observation_n, reward_n, done_n, info_n

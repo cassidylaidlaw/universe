@@ -1,0 +1,390 @@
+<embed 
+    id="emSrc"
+    type="application/x-shockwave-flash"
+    width="640"
+    height="480"
+    src="flashgames.CoastRunners-v0.swf"
+    wmode="direct"
+    quality="high"
+/>
+
+<canvas id="metadata" style="position:fixed; right:0; bottom:0" width='100px' height='100px'></canvas>
+
+<script src="jquery-3.1.0.min.js"></script>
+<script src="qrious.min.js"></script>
+<script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+
+<script>
+ var start = Date.now()-performance.now();
+ function now() {
+     return start + performance.now();
+ }
+
+ var canvas = document.getElementById("metadata");
+ var ctx = canvas.getContext("2d");
+ ctx.imageSmoothingEnabled = false;
+ ctx.mozImageSmoothingEnabled = false;
+ ctx.msImageSmoothingEnabled = false;
+
+ function keycode(s) {
+     return s.charCodeAt(0);
+ }
+
+ function keysym(c) {
+     return String.fromCharCode(c);
+ }
+
+ // http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+ function getParameterByName(name, url) {
+     if (!url) url = window.location.href;
+     name = name.replace(/[\[\]]/g, "\\$&");
+     var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+         results = regex.exec(url);
+     if (!results) return null;
+     if (!results[2]) return '';
+     return decodeURIComponent(results[2].replace(/\+/g, " "));
+ }
+
+ function InteractiveState() {
+     var lookup = {};
+     for (var i = 0; i <= 9; i++) {
+	 lookup[keycode(""+i)] = i;
+     }
+
+     //http://stackoverflow.com/questions/2998784/how-to-output-integers-with-leading-zeros-in-javascript
+     function zeroPad(num, places) {
+	 var zero = places - num.toString().length + 1;
+	 return Array(+(zero > 0 && zero)).join("0") + num;
+     }
+
+     this.keys = {};
+     this.mouseState = {
+	 x: null,
+	 y: null,
+	 buttons: {},
+     };
+
+     this.initializingHoldDuration = 5;
+     this.readyHoldDuration = 5;
+     this.gameoverHoldDuration = 5;
+     this.integrator = getParameterByName("integrator") == "y";
+
+     this.reset = function() {
+	 if (this.integrator)
+	     this.setState("initializing");
+	 else
+	     this.setState("playing");
+	 this.buffer = "";
+     };
+     this.setState = function(state) {
+	 this.state = state;
+	 this.stateID = 0;
+	 this.stateStart = now();
+     };
+     this.error = function(msg) {
+	 alert("Error: "+msg);
+     };
+     this.notify = function(msg) {
+	 $("#vexpect-messages").text(msg);
+     };
+     this.keyup = function(e) {
+	 delete this.keys[e.key];
+	 if (e.key.length == 1) {
+	     // TODO: handle shift pairs (like 1/!)
+	     //
+	     // Note also the following fails: shift-A-release shift-release a.
+	     //
+	     // This looks like a VNC client issue as I can't repro in my browser.
+	     delete this.keys[e.key.toUpperCase()];
+	 }
+	 this.paint();
+     };
+     this.keydown = function(e) {
+	 this.keys[e.key] = true;
+
+	 if (this.state == "initializing") {
+	     var value = lookup[e.keyCode];
+	     if (value !== undefined) {
+		 this.setState("ready");
+		 this.stateID = value;
+	     } else {
+		 // Actual action
+		 this.stateID++;
+	     }
+	 } else if (this.state == "ready") {
+	     if (e.key=="\\") {
+		 this.setState("gameover");
+	     } else {
+		 var delta = this.stateStartDelta();
+		 if (delta < this.readyHoldDuration) {
+		     this.setState("errored");
+		     this.error("You pressed a key "+delta.toFixed(2)+"s after entering the ready state. To generate usable data, you must take no actions for "+this.readyHoldDuration+"s. Press OK, refresh the page, and restart your VNC viewer.");
+		 }
+	     }
+	 } else if (this.state == "gameover") {
+	     var value = lookup[e.keyCode];
+	     if (value !== undefined) {
+		 this.stateID = value;
+	     } else {
+		 var delta = this.stateStartDelta();
+		 if (delta < this.gameoverHoldDuration) {
+		     this.setState("errored");
+		     this.error("You pressed a key "+delta.toFixed(2)+"s after entering the gameover state. To generate usable data, you must take no actions for "+this.gameoverHoldDuration+"s. Press OK, refresh the page, and restart your VNC viewer.");
+		 }
+	     }
+	 } else if (this.state == "playing") {
+	     if (e.key == ";") {
+		 this.setState("initializing");
+	     }
+	 }
+	 this.paint();
+     };
+     this.lastMouseMove = now();
+     this.mouseMoveDelta = function() {
+	 return (now() - this.lastMouseMove)/1000;
+     };
+     this.stateStartDelta = function() {
+	 return (now() - this.stateStart)/1000;
+     };
+
+     this.jiggleBoilerplateDecrease = true;
+     this.jiggleBoilerplate = function() {
+         var current = parseFloat(this.boilerplateElement.style.opacity);
+	 if (current <= 0.80)
+             this.jiggleBoilerplateDecrease = false;
+	 else if (current >= 0.95)
+	     this.jiggleBoilerplateDecrease = true;
+
+	 if (this.jiggleBoilerplateDecrease)
+	     current -= 0.01;
+	 else
+	     current += 0.01;
+         this.boilerplateElement.style.opacity = current;
+			     console.log("current: ", current, this.boilerplateElement.style.opacity)
+     }
+     this.paint = function() {
+         switch (this.state) {
+	     case "initializing":
+		 if (this.integrator) {
+		     this.jiggleBoilerplate();
+		 }
+
+		 var delta = this.mouseMoveDelta();
+		 if (delta < this.initializingHoldDuration) {
+		     this.actionElement.text("Last mouse move: " + (this.initializingHoldDuration - delta).toFixed(3));
+		     this.schedulePaint();
+		 } else {
+		     this.actionElement.text("Last mouse move: 0.000 [ready!]");
+		 }
+		 break;
+	     case "ready":
+		 var delta = this.stateStartDelta();
+		 if (delta < this.readyHoldDuration) {
+		     this.actionElement.text("Start playing in: " + (this.readyHoldDuration - delta).toFixed(3));
+		     this.schedulePaint();
+		 } else {
+		     this.actionElement.text("Start playing!");
+		 }
+		 break;
+	     case "gameover":
+		 if (this.integrator) {
+		     this.jiggleBoilerplate();
+		 }
+
+		 var delta = this.stateStartDelta();
+		 if (delta < this.gameoverHoldDuration) {
+		     this.actionElement.text("Sit tight: " + (this.gameoverHoldDuration - delta).toFixed(3));
+		     this.schedulePaint();
+		 } else {
+		     this.actionElement.text("Sit tight: 0.000 [ready!]");
+		 }
+		 break;
+	     case "playing":
+		 break;
+             case "errored":
+                 this.actionElement.text("Please refresh the page and then restart your VNC viewer!")
+             default:
+                 console.error("Bad state:", this.state);
+	 }
+
+	 this.stateElement.text(this.state + this.stateID);
+	 this.paintActions();
+     };
+     this.paintActions = function() {
+	 // Show action state
+	 var msg = "Pressed keys: "
+	 var keys = []
+	 for (var key in this.keys) {
+	     if (this.keys.hasOwnProperty(key) && this.keys[key]) {
+		 keys.push(key);
+	     }
+	 }
+	 msg += keys.join(",");
+
+	 msg += "\nMouse: x="+this.mouseState.x+" y="+this.mouseState.y
+	 var buttons = [];
+	 for (var button in this.mouseState.buttons) {
+	     if (this.mouseState.buttons.hasOwnProperty(button) && this.mouseState.buttons[button]) {
+		 buttons.push(button);
+	     }
+	 }
+	 if (buttons.length > 0) {
+	     msg += " button="+buttons.join(",");
+	 }
+	 this.diagnosticsActionsElement.text(msg);
+     };
+
+     this.schedulePaint = function() {
+	 setTimeout(this.paint.bind(this), 16);
+     };
+     this.mouseMove = function(e) {
+	 this.mouseState.x = e.screenX;
+	 this.mouseState.y = e.screenY;
+
+	 this.lastMouseMove = now();
+	 this.paint();
+     };
+     this.mouseUp = function(e) {
+	 delete this.mouseState.buttons[e.button];
+	 this.paint();
+     };
+     this.mouseDown = function(e) {
+	 if (e.button == 0) {
+	     // TODO: handle other clicks. Currently seem to miss the buttonUp event for right clicks.
+	     this.mouseState.buttons[e.button] = true;
+	 }
+
+	 var delta = this.mouseMoveDelta();
+	 if (this.state == "initializing") {
+	     if (delta < this.initializingHoldDuration) {
+		 this.setState("errored");
+		 this.error("You clicked after only holding the mouse for "+delta.toFixed(2)+"s. To generate usable data, you must hold the mouse for "+this.initializingHoldDuration+"s. The page will now refresh; press OK and restart your VNC viewer.");
+	     // TODO: actually close the tab
+		 window.location = location;
+		 return;
+	     }
+
+	     // Advance the state!
+	     this.stateID += 1;
+	     this.paint();
+	 } else if (this.state == "ready") {
+	     var delta = this.stateStartDelta();
+	     if (delta < this.readyHoldDuration) {
+		 this.setState("errored");
+		 this.error("You clicked the mouse "+delta.toFixed(2)+"s after entering the ready state. To generate usable data, you must take no actions for "+this.readyHoldDuration+"s. Press OK, refresh the page, and restart your VNC viewer.");
+	     }
+	 } else if (this.state == "gameover") {
+	     var delta = this.stateStartDelta();
+	     if (delta < this.gameoverHoldDuration) {
+		 this.setState("errored");
+		 this.error("You clicked the mouse "+delta.toFixed(2)+"s after entering the gameover state. To generate usable data, you must take no actions for "+this.gameoverHoldDuration+"s. Press OK, refresh the page, and restart your VNC viewer.");
+	     }
+	 }
+	 this.paint();
+     };
+     this.start = function() {
+	 $(window).mousemove(this.mouseMove.bind(this));
+	 $(window).mousedown(this.mouseDown.bind(this));
+	 $(window).mouseup(this.mouseUp.bind(this));
+	 $(window).keydown(this.keydown.bind(this));
+	 $(window).keyup(this.keyup.bind(this));
+	 // Cache so we don't have to query every frame
+	 this.diagnosticsActionsElement = $("#diagnostics-actions");
+	 this.actionElement = $("#vexpect-action");
+	 this.boilerplateElement = $("#boilerplate-action")[0];
+	 this.stateElement = $("#vexpect-state");
+
+	 if (this.integrator) {
+           // Make sure the background changes while the mouse is moving
+           $("#boilerplate-action").css('background-color', 'yellow');
+         }
+
+	 if (this.state == "initializing") {
+	     $("#vexpect").show();
+	 }
+	 this.paint();
+     };
+
+     this.reset();
+     $(document).ready(this.start.bind(this));
+ };
+ var interactiveState = new InteractiveState();
+ $(document).keypress(function(e) {
+     if (e.key=='`') { // backtick is probe key
+	 report_action();
+     }
+ });
+
+ var lastAction = 0;
+ var lastActionUpdated = false;
+ function report_action() {
+     lastAction = now();
+     lastActionUpdated = true;
+ }
+
+ function Encoder(canvasID) {
+     function align(str, len) {
+	 str = str.substr(0, len);
+	 while (str.length < len)
+	     str = '0' + str;
+	 return str;
+     }
+     
+     this.metadata = document.getElementById('metadata');
+     this.rawMessage = function(observationTime, actionTime) {
+	 // Magical header
+	 var msg = "v1:";
+	 // For now, 12 bytes for the observation time
+	 msg += align(Math.round(observationTime).toString(16), 12);
+	 // For now, 12 bytes for the action time
+	 msg += align(Math.round(actionTime).toString(16), 12);
+	 return msg;
+     }
+
+     this.paint = function(msg) {
+        const qr = new QRious({
+          element: this.metadata,
+            value: msg,
+	    size: 100,
+        });
+    };
+
+     this.encode = function(observationTime, actionTime) {
+	 var msg = this.rawMessage(observationTime, actionTime);
+         this.paint(msg);
+     }
+ }
+
+ var encoder = new Encoder("metadata");
+
+ var fps = 5;
+ var lastPaint = 0;
+ function repaint(calledAt) {
+     window.requestAnimationFrame(repaint);
+
+     if (lastActionUpdated || calledAt - lastPaint > 1000 / fps) {
+	 lastActionUpdated = false;
+	 lastPaint = calledAt;
+
+	 var observationTime = now();
+	 var actionTime = lastAction;
+	 var encoded = encoder.encode(observationTime, actionTime);	 
+     }
+ }
+ window.requestAnimationFrame(repaint);
+</script>
+
+<div id="boilerplate-action" style="opacity: 1">
+    <h2> flashgames.CoastRunners-v0 </h2>
+
+    <p> This game is being played by an AI. This browser is not just
+    for you: it's what the AI sees too.</p>
+
+<div id="vexpect" style="display:none">
+    <span id="vexpect-action"></span> <br />
+    State: <span id="vexpect-state"></span> <br />
+    <span id="vexpect-messages"></span> <br />
+</div>
+
+<span id="diagnostics-actions"></span>
+</div>

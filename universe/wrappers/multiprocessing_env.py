@@ -19,12 +19,12 @@ class RemoveNones(vectorized.Wrapper):
         super(RemoveNones, self).__init__(env)
         self.plausible_observation = None
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         self.plausible_observation = observation_n[0]
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         observation_n = [ob if ob is not None else self.plausible_observation for ob in observation_n]
         return observation_n, reward_n, done_n, info
@@ -56,11 +56,11 @@ episodes that are now done.
             else:
                 break
 
-    def _reset(self):
+    def reset(self):
         self._clear_state()
         return self.env.reset()
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         # Pass along ID of potentially-done episode
         for i, info_i in enumerate(info['n']):

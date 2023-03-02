@@ -300,13 +300,13 @@ class MultiprocessingEnv(core.Env):
         seed_n(self.worker_n, seed)
         return [[seed_i] for seed_i in seed]
 
-    def _reset(self):
+    def reset(self):
         return reset_n(self.worker_n)
 
-    def _step(self, action_n):
+    def step(self, action_n):
         return step_n(self.worker_n, action_n)
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         return render_n(self.worker_n, mode=mode, close=close)
 
     def mask(self, i):

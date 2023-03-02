@@ -5,7 +5,7 @@ import random
 import uuid
 
 import universe
-from gym.utils import reraise
+# from gym.utils import reraise
 from universe import error, pyprofile, rewarder, spaces, twisty, vectorized, vncdriver
 from universe import remotes as remotes_module
 from universe.envs import diagnostics
@@ -271,7 +271,8 @@ class VNCEnv(vectorized.Env):
             try:
                 self.vnc_session.connect(**kwargs)
             except TypeError as e:
-                reraise(suffix="(HINT: this error was while passing arguments to the VNCSession driver: {})".format(kwargs))
+                raise e
+                # reraise(suffix="(HINT: this error was while passing arguments to the VNCSession driver: {})".format(kwargs))
 
             # TODO: name becomes index:pod_id
             # TODO: never log index, just log name
@@ -332,7 +333,7 @@ class VNCEnv(vectorized.Env):
             if hasattr(self, 'remotes_manager') and self._remotes_manager:
                 self._remotes_manager.close()
 
-    def _reset(self):
+    def reset(self):
         self._handle_connect()
 
         if self.rewarder_session:
@@ -412,7 +413,7 @@ class VNCEnv(vectorized.Env):
             action_d[self.connection_names[i]] = action
         return action_d
 
-    def _step(self, action_n):
+    def step(self, action_n):
         self._handle_connect()
 
         # Compile actions to something more palatable by drivers
@@ -542,7 +543,7 @@ class VNCEnv(vectorized.Env):
             if obs_info is not None:
                 info.update(obs_info)
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         if close:
             # render(close) is not currently supported by the Go VNCSession
             return

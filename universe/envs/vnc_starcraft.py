@@ -27,7 +27,7 @@ class StarCraftEnv(vnc_env.VNCEnv):
         )
         self.safe_action_space = self.action_space
 
-    # def _step(self, action_n):
+    # def step(self, action_n):
     #     return super(StarCraftEnv, self)._step(
     #         (StarCraftEventFilter.filter(a) for a in action_n))
 

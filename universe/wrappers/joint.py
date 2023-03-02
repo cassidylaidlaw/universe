@@ -24,10 +24,10 @@ class Joint(vectorized.Wrapper):
         if hasattr(self, 'pool'):
             self.pool.close()
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
         return self.env_m[0]._render(mode=mode, close=close)
 
-    def _reset(self):
+    def reset(self):
         # Keep all env[0] action on the main thread, in case we ever
         # need to render. Otherwise we get segfaults from the
         # go-vncdriver.
@@ -40,7 +40,7 @@ class Joint(vectorized.Wrapper):
             observation_n += observation_m
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n = []
         reward_n = []
         done_n = []

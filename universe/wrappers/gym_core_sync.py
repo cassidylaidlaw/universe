@@ -22,7 +22,7 @@ class GymCoreSync(vectorized.Wrapper):
         # Metadata has already been cloned
         self.metadata['semantics.async'] = False
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         new_observation_n, self.reward_n, self.done_n, self.info = self.env.step([[] for i in range(self.n)])
         rewarder.merge_observation_n(observation_n, new_observation_n)
@@ -33,7 +33,7 @@ class GymCoreSync(vectorized.Wrapper):
         assert all(r == 0 for r in self.reward_n), "Unexpectedly received rewards during reset phase: {}".format(self.reward_n)
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         # Add C keypress in order to "commit" the action, as
         # interpreted by the remote.
         action_n = [action + [

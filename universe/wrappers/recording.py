@@ -87,7 +87,7 @@ for examining logs.
             self._log_n[i] = RecordingWriter(self._recording_dir, self._instance_id, i, async_write=self._async_write)
         return self._log_n[i]
 
-    def _reset(self):
+    def reset(self):
         if self._episode_ids is None:
             self._episode_ids = [None] * self.n
         if self._step_ids is None:
@@ -105,7 +105,7 @@ for examining logs.
 
         return self.env.reset()
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         info_n = info["n"]
 

@@ -58,7 +58,7 @@ class Logger(vectorized.Wrapper):
         self.reward_lag_n = [[] for _ in range(self.n)]
         self.rewarder_message_lag_n = [[] for _ in range(self.n)]
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         if self.print_frequency is None:
             return observation_n, reward_n, done_n, info

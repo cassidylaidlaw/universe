@@ -13,11 +13,11 @@ via pyprofile.
     def configure(self, **kwargs):
         self.env.configure(**kwargs)
 
-    def _reset(self):
+    def reset(self):
         with pyprofile.push('vnc_env.Timer.reset'):
             return self.env.reset()
 
-    def _step(self, action_n):
+    def step(self, action_n):
         start = time.time()
         with pyprofile.push('vnc_env.Timer.step'):
             observation_n, reward_n, done_n, info = self.env.step(action_n)

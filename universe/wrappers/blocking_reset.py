@@ -12,7 +12,7 @@ wrapper changes it.
         self.done_n = None
         self.info = None
 
-    def _reset(self):
+    def reset(self):
         observation_n = self.env.reset()
         self.reward_n = [0] * self.n
         self.done_n = [False] * self.n
@@ -33,7 +33,7 @@ wrapper changes it.
             )
         return observation_n
 
-    def _step(self, action_n):
+    def step(self, action_n):
         observation_n, reward_n, done_n, info = self.env.step(action_n)
         if self.reward_n is not None:
             rewarder.merge_n(

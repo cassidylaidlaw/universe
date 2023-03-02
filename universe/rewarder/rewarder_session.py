@@ -234,7 +234,7 @@ class RewarderSession(object):
                 reward_buffer.mask()
         reactor.callFromThread(self._reset, seed=seed, env_id=env_id)
 
-    def _reset(self, seed=None, env_id=None):
+    def reset(self, seed=None, env_id=None):
         with self.lock:
             for client in self.clients.values():
                 d = self._send_env_reset(client, seed=seed, env_id=env_id)
